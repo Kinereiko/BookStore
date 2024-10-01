@@ -1,24 +1,20 @@
 package bookstore.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.math.BigDecimal;
-import lombok.EqualsAndHashCode;
+import jakarta.persistence.Table;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
-import lombok.ToString;
-import org.checkerframework.common.aliasing.qual.Unique;
 
 @Entity
 @Getter
 @Setter
-@ToString
-@EqualsAndHashCode
-@NoArgsConstructor
+@Table(name = "books")
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,7 +24,7 @@ public class Book {
     @NonNull
     private String author;
     @NonNull
-    @Unique
+    @Column(unique = true)
     private String isbn;
     @NonNull
     private BigDecimal price;
