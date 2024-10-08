@@ -29,6 +29,8 @@
 	<properties>
 		<maven.checkstyle.plugin.configLocation>checkstyle.xml</maven.checkstyle.plugin.configLocation>
 		<java.version>21</java.version>
+		<lombok.mapsruct.binding.version>0.2.0</lombok.mapsruct.binding.version>
+		<mapstruct.version>1.5.5.Final</mapstruct.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -68,6 +70,12 @@
 			<artifactId>h2</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct</artifactId>
+			<version>${mapstruct.version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -89,6 +97,7 @@
 					<consoleOutput>true</consoleOutput>
 					<failsOnError>true</failsOnError>
 					<linkXRef>false</linkXRef>
+					<sourceDirectories>src</sourceDirectories>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -97,5 +106,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>

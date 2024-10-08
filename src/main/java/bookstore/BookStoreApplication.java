@@ -18,19 +18,32 @@ public class BookStoreApplication {
         SpringApplication.run(BookStoreApplication.class, args);
     }
 
+/*
     @Bean
     public CommandLineRunner commandLineRunner() {
         return new CommandLineRunner() {
             @Override
             public void run(String... args) throws Exception {
-                Book witcher = new Book();
-                witcher.setTitle("Witcher");
-                witcher.setAuthor("Mj Sabkovsky");
-                witcher.setPrice(BigDecimal.valueOf(230));
+                Book book = new Book();
+                book.setTitle("Sample Book 1");
+                book.setAuthor("Author A");
+                book.setIsbn("9781234567897");
+                book.setPrice(BigDecimal.valueOf(19.99));
+                book.setDescription("This is a sample book description.");
+                book.setCoverImage("http://example.com/cover1.jpg");
 
-                bookService.save(witcher);
-                System.out.println(bookService.findAll());
+                Book book2 = new Book();
+                book2.setTitle("Sample Book 2");
+                book2.setAuthor("Author B");
+                book2.setIsbn("9789876543210");
+                book2.setPrice(BigDecimal.valueOf(24.99));
+                book2.setDescription("Another sample book description.");
+                book2.setCoverImage("http://example.com/cover2.jpg");
+
+                bookService.save(book);
+                bookService.save(book2);
             }
         };
     }
+    */
 }
