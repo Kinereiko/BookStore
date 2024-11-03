@@ -1,6 +1,7 @@
 package bookstore.controller;
 
 import bookstore.dto.BookDto;
+import bookstore.dto.BookSearchParameters;
 import bookstore.dto.CreateBookRequestDto;
 import bookstore.service.BookService;
 import java.util.List;
@@ -20,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value = "/api/books")
 public class BookController {
-
     private final BookService bookService;
 
     @GetMapping
@@ -48,5 +48,10 @@ public class BookController {
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         bookService.deleteById(id);
+    }
+
+    @GetMapping("/search")
+    public List<BookDto> search(BookSearchParameters searchParameters) {
+        return bookService.search(searchParameters);
     }
 }
