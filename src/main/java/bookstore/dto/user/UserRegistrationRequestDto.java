@@ -1,5 +1,6 @@
 package bookstore.dto.user;
 
+import bookstore.validation.FieldMatch;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -8,6 +9,7 @@ import org.hibernate.validator.constraints.Length;
 
 @Getter
 @Setter
+@FieldMatch(message = "Passwords must match")
 public class UserRegistrationRequestDto {
     @NotBlank
     @Email

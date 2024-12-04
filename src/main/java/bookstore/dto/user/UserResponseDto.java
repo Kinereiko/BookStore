@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 public class UserResponseDto {
     @NotNull
-    Long id;
+    private Long id;
     @NotBlank
     @Email
     private String email;
