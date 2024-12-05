@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: rename-isDeleted-to-is_deleted
+      author: Ki_ne_rei_ko
+      changes:
+        - renameColumn:
+            tableName: users
+            oldColumnName: isDeleted
+            newColumnName: is_deleted
+            columnDataType: boolean
