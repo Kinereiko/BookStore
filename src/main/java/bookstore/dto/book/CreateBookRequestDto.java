@@ -1,4 +1,4 @@
-package bookstore.dto;
+package bookstore.dto.book;
 
 import bookstore.validation.Isbn;
 import jakarta.validation.constraints.Min;
