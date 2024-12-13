@@ -6,11 +6,13 @@ import bookstore.exception.RegistrationException;
 import bookstore.mapper.UserMapper;
 import bookstore.model.User;
 import bookstore.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
