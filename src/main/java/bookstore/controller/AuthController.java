@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
     private final UserService userService;
 
-    //@ResponseStatus(HttpStatus.CONFLICT)
     @PostMapping("/registration")
     @Operation(summary = "Registration", description = "Register user")
     public UserResponseDto register(@RequestBody @Valid UserRegistrationRequestDto request)
