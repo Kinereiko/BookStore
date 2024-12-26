@@ -2,6 +2,7 @@ package bookstore.service;
 
 import bookstore.dto.user.UserRegistrationRequestDto;
 import bookstore.dto.user.UserResponseDto;
+import bookstore.exception.EntityNotFoundException;
 import bookstore.exception.RegistrationException;
 import bookstore.mapper.UserMapper;
 import bookstore.model.Role;
@@ -10,7 +11,6 @@ import bookstore.repository.RoleRepository;
 import bookstore.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import java.util.Optional;
-import javax.management.relation.RoleNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,8 +25,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public UserResponseDto register(UserRegistrationRequestDto requestDto)
-            throws RoleNotFoundException {
+    public UserResponseDto register(UserRegistrationRequestDto requestDto) {
         if (userRepository.existsByEmail(requestDto.getEmail())) {
             throw new RegistrationException("Email already exists: " + requestDto.getEmail());
         }
@@ -34,7 +33,7 @@ public class UserServiceImpl implements UserService {
         User user = userMapper.toModel(requestDto);
         user.setPassword(passwordEncoder.encode(requestDto.getPassword()));
         user.getRoles().add(defaultRole
-                .orElseThrow(() -> new RoleNotFoundException("Can't find role: "
+                .orElseThrow(() -> new EntityNotFoundException("Can't find role: "
                         + Role.RoleName.USER)));
         return userMapper.toDto(userRepository.save(user));
     }
