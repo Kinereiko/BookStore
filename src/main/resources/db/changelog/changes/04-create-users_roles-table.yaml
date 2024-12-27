@@ -1,0 +1,34 @@
+databaseChangeLog:
+  - changeSet:
+      id: create_users_roles_table
+      author: Ki_ne_rei_ko
+      changes:
+        - createTable:
+            tableName: users_roles
+            columns:
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: role_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+
+  - changeSet:
+      id: insert_users_roles
+      author: Ki_ne_rei_ko
+      changes:
+        - insert:
+            tableName: users_roles
+            columns:
+              - column:
+                  name: user_id
+                  value: 1
+              - column:
+                  name: role_id
+                  value: 1
