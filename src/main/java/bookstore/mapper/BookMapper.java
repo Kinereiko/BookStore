@@ -5,10 +5,10 @@ import bookstore.dto.book.BookDto;
 import bookstore.dto.book.BookDtoWithoutCategoryIds;
 import bookstore.dto.book.CreateBookRequestDto;
 import bookstore.model.Book;
+import java.util.ArrayList;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
-import java.util.ArrayList;
 
 @Mapper(config = MapperConfig.class)
 public interface BookMapper {

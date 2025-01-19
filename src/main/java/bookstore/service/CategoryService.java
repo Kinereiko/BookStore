@@ -1,9 +1,8 @@
 package bookstore.service;
 
+import bookstore.dto.book.BookDtoWithoutCategoryIds;
 import bookstore.dto.category.CategoryDto;
 import bookstore.dto.category.CategoryRequestDto;
-import bookstore.model.Category;
-
 import java.util.List;
 
 public interface CategoryService {
@@ -16,4 +15,6 @@ public interface CategoryService {
     void deleteById(Long id);
 
     CategoryDto update(Long id, CategoryRequestDto requestDto);
+
+    List<BookDtoWithoutCategoryIds> getBooksByCategoryId(Long id);
 }

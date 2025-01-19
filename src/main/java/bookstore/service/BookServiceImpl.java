@@ -6,9 +6,14 @@ import bookstore.dto.book.CreateBookRequestDto;
 import bookstore.exception.EntityNotFoundException;
 import bookstore.mapper.BookMapper;
 import bookstore.model.Book;
+import bookstore.model.Category;
 import bookstore.repository.BookRepository;
 import bookstore.repository.BookSpecificationBuilder;
+import bookstore.repository.CategoryRepository;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -18,12 +23,14 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
+    private final CategoryRepository categoryRepository;
     private final BookMapper bookMapper;
     private final BookSpecificationBuilder bookSpecificationBuilder;
 
     @Override
     public BookDto save(CreateBookRequestDto requestDto) {
         Book book = bookMapper.toModel(requestDto);
+        book.getCategories().addAll(getCategories(requestDto.getCategoryIds()));
         return bookMapper.toDto(bookRepository.save(book));
     }
 
@@ -49,6 +56,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public BookDto updateId(Long id, CreateBookRequestDto requestDto) {
         Book book = bookMapper.toModel(requestDto);
+        book.getCategories().addAll(getCategories(requestDto.getCategoryIds()));
         book.setId(id);
         return bookMapper.toDto(bookRepository.save(book));
     }
@@ -60,5 +68,13 @@ public class BookServiceImpl implements BookService {
                 .stream()
                 .map(bookMapper::toDto)
                 .toList();
+    }
+
+    private Set<Category> getCategories(List<Long> categoryIds) {
+        return categoryIds.stream()
+                .map(categoryRepository::findById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toSet());
     }
 }
