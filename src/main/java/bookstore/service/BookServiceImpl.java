@@ -73,13 +73,5 @@ public class BookServiceImpl implements BookService {
         return categoryIds.stream()
                 .map(categoryRepository::getReferenceById)
                 .collect(Collectors.toSet());
-
-        /*
-        categoryIds.stream()
-                .map(categoryRepository::findById)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toSet());
-        */
     }
 }

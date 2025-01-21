@@ -4,6 +4,7 @@ import bookstore.dto.book.BookDtoWithoutCategoryIds;
 import bookstore.dto.category.CategoryDto;
 import bookstore.dto.category.CategoryRequestDto;
 import java.util.List;
+import org.springframework.data.domain.Pageable;
 
 public interface CategoryService {
     CategoryDto save(CategoryRequestDto requestDto);
@@ -16,5 +17,5 @@ public interface CategoryService {
 
     CategoryDto update(Long id, CategoryRequestDto requestDto);
 
-    List<BookDtoWithoutCategoryIds> getBooksByCategoryId(Long id);
+    List<BookDtoWithoutCategoryIds> getBooksByCategoryId(Long id, Pageable pageable);
 }
