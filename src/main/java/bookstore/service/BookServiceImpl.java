@@ -11,7 +11,6 @@ import bookstore.repository.BookRepository;
 import bookstore.repository.BookSpecificationBuilder;
 import bookstore.repository.CategoryRepository;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -72,9 +71,15 @@ public class BookServiceImpl implements BookService {
 
     private Set<Category> getCategories(List<Long> categoryIds) {
         return categoryIds.stream()
+                .map(categoryRepository::getReferenceById)
+                .collect(Collectors.toSet());
+
+        /*
+        categoryIds.stream()
                 .map(categoryRepository::findById)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toSet());
+        */
     }
 }

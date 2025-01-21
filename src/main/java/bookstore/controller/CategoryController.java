@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Category management", description = "Endpoints for managing categories")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(value = "/categories")
+@RequestMapping("/categories")
 public class CategoryController {
     private final CategoryService categoryService;
 
@@ -42,6 +42,7 @@ public class CategoryController {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     @Operation(summary = "Create a category", description = "Create a new category")
     public CategoryDto save(@RequestBody @Valid CategoryRequestDto requestDto) {

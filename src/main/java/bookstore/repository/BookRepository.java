@@ -9,6 +9,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.lang.Nullable;
 
@@ -23,6 +24,7 @@ public interface BookRepository extends JpaRepository<Book, Long>,
     @EntityGraph(attributePaths = {"categories"})
     List<Book> findAll(@Nullable Specification<Book> spec);
 
-    @EntityGraph(attributePaths = {"categories"})
-    List<Book> findAllByCategories_Id(Long categoryId);
+    //@EntityGraph(attributePaths = {"categories"})
+    @Query("SELECT b FROM Book b JOIN b.categories c WHERE c.id = :categoryId")
+    List<Book> findAllByCategoriesId(Long categoryId);
 }
