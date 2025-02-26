@@ -23,6 +23,7 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final ShoppingCartService shoppingCartService;
 
     @Override
     public UserResponseDto register(UserRegistrationRequestDto requestDto) {
@@ -35,6 +36,8 @@ public class UserServiceImpl implements UserService {
         user.getRoles().add(defaultRole
                 .orElseThrow(() -> new EntityNotFoundException("Can't find role: "
                         + Role.RoleName.USER)));
-        return userMapper.toDto(userRepository.save(user));
+        UserResponseDto userMapperDto = userMapper.toDto(userRepository.save(user));
+        shoppingCartService.createDefaultShoppingCart(user.getEmail());
+        return userMapperDto;
     }
 }
