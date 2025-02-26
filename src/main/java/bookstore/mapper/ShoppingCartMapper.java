@@ -1,15 +1,14 @@
 package bookstore.mapper;
 
 import bookstore.config.MapperConfig;
-import bookstore.dto.cartItem.CartItemDto;
-import bookstore.dto.shoppingCart.ShoppingCartDto;
-import bookstore.dto.shoppingCart.ShoppingCartRequestDto;
+import bookstore.dto.cartitem.CartItemDto;
+import bookstore.dto.shoppingcart.ShoppingCartDto;
+import bookstore.dto.shoppingcart.ShoppingCartRequestDto;
 import bookstore.model.ShoppingCart;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;

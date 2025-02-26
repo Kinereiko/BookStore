@@ -1,4 +1,4 @@
-package bookstore.dto.cartItem;
+package bookstore.dto.cartitem;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 public class CartItemRequestDto {
     @NotNull
-    private Long BookId;
+    private Long bookId;
     @NotNull
     @Min(1)
     private int quantity;

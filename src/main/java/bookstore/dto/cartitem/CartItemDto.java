@@ -1,4 +1,4 @@
-package bookstore.dto.cartItem;
+package bookstore.dto.cartitem;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,4 +1,4 @@
-package bookstore.dto.cartItem;
+package bookstore.dto.cartitem;
 
 import jakarta.validation.constraints.Min;
 import lombok.Getter;
@@ -8,5 +8,5 @@ import lombok.Setter;
 @Setter
 public class CartItemUpdateRequestDto {
     @Min(1)
-    int quantity;
+    private int quantity;
 }

@@ -1,7 +1,7 @@
 package bookstore.service;
 
-import bookstore.dto.cartItem.CartItemRequestDto;
-import bookstore.dto.shoppingCart.ShoppingCartDto;
+import bookstore.dto.cartitem.CartItemRequestDto;
+import bookstore.dto.shoppingcart.ShoppingCartDto;
 import bookstore.model.User;
 
 public interface ShoppingCartService {

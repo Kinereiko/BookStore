@@ -1,8 +1,8 @@
 package bookstore.mapper;
 
 import bookstore.config.MapperConfig;
-import bookstore.dto.cartItem.CartItemDto;
-import bookstore.dto.cartItem.CartItemRequestDto;
+import bookstore.dto.cartitem.CartItemDto;
+import bookstore.dto.cartitem.CartItemRequestDto;
 import bookstore.model.CartItem;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
