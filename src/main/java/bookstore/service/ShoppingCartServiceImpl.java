@@ -11,31 +11,32 @@ import bookstore.model.User;
 import bookstore.repository.BookRepository;
 import bookstore.repository.CartItemRepository;
 import bookstore.repository.ShoppingCartRepository;
-import bookstore.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ShoppingCartServiceImpl implements ShoppingCartService {
     private final ShoppingCartRepository shoppingCartRepository;
     private final CartItemRepository cartItemRepository;
-    private final UserRepository userRepository;
     private final BookRepository bookRepository;
     private final ShoppingCartMapper shoppingCartMapper;
     private final CartItemMapper cartItemMapper;
 
     @Override
-    public ShoppingCartDto addCartItem(CartItemRequestDto requestDto) {
-        User user = getAuthenticatedUser();
+    @Transactional
+    public ShoppingCartDto addCartItem(CartItemRequestDto requestDto,
+                                       Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
         CartItem cartItemExist = cartItemRepository.findByShoppingCartIdWhereBookId(user.getId(),
                 requestDto.getBookId());
         if (cartItemExist != null) {
             return updateCartItemById(cartItemExist.getId(),
-                    cartItemExist.getQuantity() + requestDto.getQuantity());
+                    cartItemExist.getQuantity() + requestDto.getQuantity(),
+                    authentication);
         }
         CartItem cartItem = cartItemMapper.toModel(requestDto);
         cartItem.setShoppingCart(shoppingCartRepository.findByUserId(user.getId()));
@@ -46,21 +47,24 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
 
     @Override
-    public ShoppingCartDto find() {
+    public ShoppingCartDto find(Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
         ShoppingCart shoppingCart = shoppingCartRepository
-                .findByUserId(getAuthenticatedUser().getId());
+                .findByUserId(user.getId());
         return shoppingCartMapper.toDto(shoppingCart);
     }
 
     @Override
-    public ShoppingCartDto updateCartItemById(Long id, int quantity) {
+    public ShoppingCartDto updateCartItemById(Long id, int quantity,
+                                              Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
         CartItem cartItem = cartItemRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Can't find cart item with id: "
                         + id));
         cartItem.setQuantity(quantity);
         cartItemRepository.save(cartItem);
         ShoppingCart shoppingCart = shoppingCartRepository
-                .findByUserId(getAuthenticatedUser().getId());
+                .findByUserId(user.getId());
         return shoppingCartMapper.toDto(shoppingCart);
     }
 
@@ -70,23 +74,9 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
 
     @Override
-    public void createDefaultShoppingCart(String email) {
-        User user = userRepository.findWithRolesByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("Can't find user with email: "
-                        + email));
+    public void createDefaultShoppingCart(User user) {
         ShoppingCart shoppingCart = new ShoppingCart();
         shoppingCart.setUser(user);
         shoppingCartRepository.save(shoppingCart);
-    }
-
-    @Override
-    public User getAuthenticatedUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
-            return userRepository.findWithRolesByEmail(((UserDetails) authentication.getPrincipal())
-                    .getUsername()).orElseThrow(()
-                            -> new EntityNotFoundException("Can't find authenticated user"));
-        }
-        return null;
     }
 }

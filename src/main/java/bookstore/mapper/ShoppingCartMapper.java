@@ -3,7 +3,6 @@ package bookstore.mapper;
 import bookstore.config.MapperConfig;
 import bookstore.dto.cartitem.CartItemDto;
 import bookstore.dto.shoppingcart.ShoppingCartDto;
-import bookstore.dto.shoppingcart.ShoppingCartRequestDto;
 import bookstore.model.ShoppingCart;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -16,8 +15,6 @@ import org.mapstruct.MappingTarget;
 @Mapper(config = MapperConfig.class)
 public interface ShoppingCartMapper {
     ShoppingCartDto toDto(ShoppingCart shoppingCart);
-
-    ShoppingCart toModel(ShoppingCartRequestDto requestDto);
 
     @AfterMapping
     default void setUserId(@MappingTarget ShoppingCartDto cartDto,
