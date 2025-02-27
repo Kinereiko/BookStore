@@ -11,6 +11,8 @@ import bookstore.model.User;
 import bookstore.repository.BookRepository;
 import bookstore.repository.CartItemRepository;
 import bookstore.repository.ShoppingCartRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -25,9 +27,10 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     private final BookRepository bookRepository;
     private final ShoppingCartMapper shoppingCartMapper;
     private final CartItemMapper cartItemMapper;
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
-    @Transactional
     public ShoppingCartDto addCartItem(CartItemRequestDto requestDto,
                                        Authentication authentication) {
         User user = (User) authentication.getPrincipal();
@@ -42,6 +45,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         cartItem.setShoppingCart(shoppingCartRepository.findByUserId(user.getId()));
         cartItem.setBook(bookRepository.getReferenceById(requestDto.getBookId()));
         cartItemRepository.save(cartItem);
+        entityManager.clear();
         ShoppingCart shoppingCart = shoppingCartRepository.findByUserId(user.getId());
         return shoppingCartMapper.toDto(shoppingCart);
     }
