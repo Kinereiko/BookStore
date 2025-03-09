@@ -17,5 +17,5 @@ public interface OrderService {
 
     OrderItemDto getOrderItemById(Long orderId, Long orderItemId, Authentication authentication);
 
-    void updateStatus(Long id, OrderStatusRequestDto requestDto);
+    OrderDto updateStatus(Long id, OrderStatusRequestDto requestDto);
 }

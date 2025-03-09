@@ -5,6 +5,7 @@ import bookstore.dto.order.OrderRequestDto;
 import bookstore.dto.order.OrderStatusRequestDto;
 import bookstore.dto.orderitem.OrderItemDto;
 import bookstore.exception.EntityNotFoundException;
+import bookstore.exception.OrderProcessingException;
 import bookstore.mapper.OrderItemMapper;
 import bookstore.mapper.OrderMapper;
 import bookstore.model.Order;
@@ -37,13 +38,51 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderDto> findAll(Pageable pageable, Authentication authentication) {
-        Long userId = ((User) authentication.getPrincipal()).getId();
+        Long userId = getUserFromAuthentication(authentication).getId();
         return orderMapper.toOrderDtoList(orderRepository.findAllByUserId(userId, pageable));
     }
 
     @Override
     public OrderDto save(OrderRequestDto requestDto, Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
+        User user = getUserFromAuthentication(authentication);
+        Order order = createOrder(requestDto, user);
+        return orderMapper.toDto(orderRepository.save(order));
+    }
+
+    @Override
+    public List<OrderItemDto> getOrderItemsById(Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Can't find order with id: "
+                        + id));
+        List<OrderItem> orders = order.getOrderItems().stream().toList();
+        return orderItemMapper.toDtoList(orders);
+    }
+
+    @Override
+    public OrderItemDto getOrderItemById(Long orderId, Long orderItemId,
+                                         Authentication authentication) {
+        Long userId = getUserFromAuthentication(authentication).getId();
+        OrderItem orderItem = orderItemRepository
+                .findByIdAndOrderIdAndUserId(orderId, orderId, userId)
+                .orElseThrow(() -> new EntityNotFoundException("Can't find order item with id: "
+                        + orderItemId + " and order id: " + orderId + " and user id: " + userId));
+        return orderItemMapper.toDto(orderItem);
+    }
+
+    @Override
+    public OrderDto updateStatus(Long id, OrderStatusRequestDto requestDto) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Can't find order with id: "
+                + id));
+        order.setStatus(requestDto.getStatus());
+        return orderMapper.toDto(orderRepository.save(order));
+    }
+
+    private User getUserFromAuthentication(Authentication authentication) {
+        return (User) authentication.getPrincipal();
+    }
+
+    private Order createOrder(OrderRequestDto requestDto, User user) {
         Order order = new Order();
         order.setUser(user);
         order.setStatus(Order.Status.PENDING);
@@ -55,7 +94,7 @@ public class OrderServiceImpl implements OrderService {
 
         ShoppingCart shoppingCart = shoppingCartRepository.findByUserId(user.getId());
         if (shoppingCart.getCartItems() == null) {
-            throw new NullPointerException("Shopping cart is empty");
+            throw new OrderProcessingException("Shopping cart is empty for user: " + user.getId());
         }
         for (var cartItem : shoppingCart.getCartItems()) {
             OrderItem orderItem = new OrderItem();
@@ -71,37 +110,9 @@ public class OrderServiceImpl implements OrderService {
         order.setTotal(total);
         order.setOrderItems(orderItems);
 
-        orderRepository.save(order);
-
         shoppingCart.getCartItems().clear();
         shoppingCartRepository.save(shoppingCart);
 
-        return orderMapper.toDto(order);
-    }
-
-    @Override
-    public List<OrderItemDto> getOrderItemsById(Long id) {
-        return orderItemMapper.toDtoList(orderRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Can't find order with id: "
-                        + id)).getOrderItems().stream().toList());
-    }
-
-    @Override
-    public OrderItemDto getOrderItemById(Long orderId, Long orderItemId,
-                                         Authentication authentication) {
-        Long userId = ((User) authentication.getPrincipal()).getId();
-        return orderItemMapper.toDto(orderItemRepository
-                .findByIdAndOrderIdAndUserId(orderId, orderId, userId)
-                .orElseThrow(() -> new EntityNotFoundException("Can't find order item with id: "
-                        + orderItemId + " and order id: " + orderId + " and user id: " + userId)));
-    }
-
-    @Override
-    public void updateStatus(Long id, OrderStatusRequestDto requestDto) {
-        Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Can't find order with id: "
-                + id));
-        order.setStatus(requestDto.getStatus());
-        orderRepository.save(order);
+        return order;
     }
 }
