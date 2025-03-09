@@ -2,8 +2,8 @@ package bookstore.mapper;
 
 import bookstore.config.MapperConfig;
 import bookstore.dto.order.OrderDto;
-import bookstore.dto.order.OrderItemsDto;
 import bookstore.model.Order;
+import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -12,6 +12,5 @@ public interface OrderMapper {
     @Mapping(source = "user.id", target = "userId")
     OrderDto toDto(Order order);
 
-    @Mapping(source = "orderItems", target = "orderItems")
-    OrderItemsDto toItemsDto(Order order);
+    List<OrderDto> toOrderDtoList(List<Order> orders);
 }

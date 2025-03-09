@@ -1,7 +1,6 @@
 package bookstore.controller;
 
 import bookstore.dto.order.OrderDto;
-import bookstore.dto.order.OrderItemsDto;
 import bookstore.dto.order.OrderRequestDto;
 import bookstore.dto.order.OrderStatusRequestDto;
 import bookstore.dto.orderitem.OrderItemDto;
@@ -11,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,8 +30,8 @@ public class OrderController {
 
     @GetMapping
     @Operation(summary = "Get all orders", description = "Get a list of all user orders")
-    public List<OrderDto> findAll(Authentication authentication) {
-        return orderService.findAll(authentication);
+    public List<OrderDto> findAll(Pageable pageable, Authentication authentication) {
+        return orderService.findAll(pageable, authentication);
     }
 
     @PostMapping
@@ -44,15 +44,16 @@ public class OrderController {
     @GetMapping("/{orderId}/items")
     @Operation(summary = "Get order items",
             description = "Get order items of specific order by id")
-    public OrderItemsDto getOrderItemsById(@PathVariable Long orderId) {
+    public List<OrderItemDto> getOrderItemsById(@PathVariable Long orderId) {
         return orderService.getOrderItemsById(orderId);
     }
 
-    @GetMapping("/{orderId}/items/{id}")
+    @GetMapping("/{orderId}/items/{orderItemId}")
     @Operation(summary = "Get order item", description = "Get order item by id from order where id")
     public OrderItemDto getOrderItemById(@PathVariable Long orderId,
-                                         @PathVariable Long id) {
-        return orderService.getOrderItemById(orderId, id);
+                                         @PathVariable Long orderItemId,
+                                         Authentication authentication) {
+        return orderService.getOrderItemById(orderId, orderItemId, authentication);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")

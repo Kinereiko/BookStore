@@ -1,7 +1,6 @@
 package bookstore.service;
 
 import bookstore.dto.order.OrderDto;
-import bookstore.dto.order.OrderItemsDto;
 import bookstore.dto.order.OrderRequestDto;
 import bookstore.dto.order.OrderStatusRequestDto;
 import bookstore.dto.orderitem.OrderItemDto;
@@ -18,11 +17,11 @@ import bookstore.repository.ShoppingCartRepository;
 import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -35,16 +34,11 @@ public class OrderServiceImpl implements OrderService {
     private final ShoppingCartRepository shoppingCartRepository;
     private final OrderMapper orderMapper;
     private final OrderItemMapper orderItemMapper;
-    private final Order.Status defaultStatus = Order.Status.PENDING;
 
     @Override
-    public List<OrderDto> findAll(Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
-        List<OrderDto> orderDtos = new ArrayList<>();
-        for (Order order : orderRepository.findAllByUserId(user.getId())) {
-            orderDtos.add(orderMapper.toDto(order));
-        }
-        return orderDtos;
+    public List<OrderDto> findAll(Pageable pageable, Authentication authentication) {
+        Long userId = ((User) authentication.getPrincipal()).getId();
+        return orderMapper.toOrderDtoList(orderRepository.findAllByUserId(userId, pageable));
     }
 
     @Override
@@ -52,7 +46,7 @@ public class OrderServiceImpl implements OrderService {
         User user = (User) authentication.getPrincipal();
         Order order = new Order();
         order.setUser(user);
-        order.setStatus(defaultStatus);
+        order.setStatus(Order.Status.PENDING);
         order.setOrderDate(LocalDateTime.now());
         order.setShippingAddress(requestDto.getShippingAddress());
 
@@ -60,6 +54,9 @@ public class OrderServiceImpl implements OrderService {
         BigDecimal total = BigDecimal.ZERO;
 
         ShoppingCart shoppingCart = shoppingCartRepository.findByUserId(user.getId());
+        if (shoppingCart.getCartItems() == null) {
+            throw new NullPointerException("Shopping cart is empty");
+        }
         for (var cartItem : shoppingCart.getCartItems()) {
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(order);
@@ -74,26 +71,29 @@ public class OrderServiceImpl implements OrderService {
         order.setTotal(total);
         order.setOrderItems(orderItems);
 
-        Order savedOrder = orderRepository.save(order);
+        orderRepository.save(order);
 
         shoppingCart.getCartItems().clear();
         shoppingCartRepository.save(shoppingCart);
 
-        return orderMapper.toDto(savedOrder);
+        return orderMapper.toDto(order);
     }
 
     @Override
-    public OrderItemsDto getOrderItemsById(Long id) {
-        return orderMapper.toItemsDto(orderRepository.findById(id)
+    public List<OrderItemDto> getOrderItemsById(Long id) {
+        return orderItemMapper.toDtoList(orderRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Can't find order with id: "
-                        + id)));
+                        + id)).getOrderItems().stream().toList());
     }
 
     @Override
-    public OrderItemDto getOrderItemById(Long orderId, Long id) {
-        return orderItemMapper.toDto(orderItemRepository.findByIdAndOrderId(id, orderId)
+    public OrderItemDto getOrderItemById(Long orderId, Long orderItemId,
+                                         Authentication authentication) {
+        Long userId = ((User) authentication.getPrincipal()).getId();
+        return orderItemMapper.toDto(orderItemRepository
+                .findByIdAndOrderIdAndUserId(orderId, orderId, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Can't find order item with id: "
-                        + id + " and order id: " + orderId)));
+                        + orderItemId + " and order id: " + orderId + " and user id: " + userId)));
     }
 
     @Override
