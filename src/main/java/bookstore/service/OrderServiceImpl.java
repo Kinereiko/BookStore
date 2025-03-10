@@ -39,7 +39,8 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderDto> findAll(Pageable pageable, Authentication authentication) {
         Long userId = getUserFromAuthentication(authentication).getId();
-        return orderMapper.toOrderDtoList(orderRepository.findAllByUserId(userId, pageable));
+        List<Order> orders = orderRepository.findAllByUserId(userId, pageable);
+        return orderMapper.toOrderDtoList(orders);
     }
 
     @Override
