@@ -1,5 +1,6 @@
 package bookstore;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -42,14 +43,12 @@ public class CategoryControllerTest {
     @Test
     @DisplayName("Create a new category")
     @Sql(scripts =
-            "classpath:database/books/delete-category-by-name.sql",
+            "classpath:database/books/cleanup.sql",
             executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void createCategory_ValidRequestDto_Success() throws Exception {
-        CategoryRequestDto requestDto = new CategoryRequestDto();
-        requestDto.setName("Fantasy");
+        CategoryRequestDto requestDto = createTestRequestDto();
 
-        CategoryDto expected = new CategoryDto();
-        expected.setName("Fantasy");
+        CategoryDto expected = createTestCategoryDto();
 
         String jsonRequest = objectMapper.writeValueAsString(requestDto);
 
@@ -69,12 +68,32 @@ public class CategoryControllerTest {
 
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     @Test
+    @DisplayName("Verify throw exception when request dto is null")
+    void createCategory_CategoryRequestDtoIsNull_ShouldThrowException() throws Exception {
+        CategoryRequestDto requestDto = null;
+
+        String jsonRequest = objectMapper.writeValueAsString(requestDto);
+
+        MvcResult result = mockMvc.perform(
+                post("/categories")
+                        .content(jsonRequest)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        int actual = result.getResponse().getStatus();
+        int expected = 400;
+        assertEquals(actual, expected);
+    }
+
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    @Test
     @DisplayName("Get all categories")
     @Sql(scripts =
-            "classpath:database/books/add-multiple-categories-table.sql",
+            "classpath:database/books/insert-data.sql",
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts =
-            "classpath:database/books/delete-all-categories-table.sql",
+            "classpath:database/books/cleanup.sql",
             executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void getAll_GivenCategoriesInDB_ReturnsAllCategories() throws Exception {
         MvcResult result = mockMvc.perform(get("/categories")
@@ -85,21 +104,33 @@ public class CategoryControllerTest {
         CategoryDto[] actual = objectMapper.readValue(
                 result.getResponse().getContentAsString(), CategoryDto[].class);
         Assertions.assertNotNull(actual);
-        Assertions.assertEquals(3, actual.length);
+        Assertions.assertEquals(2, actual.length);
+    }
+
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    @Test
+    @DisplayName("Get all categories empty list")
+    void getAll_EmptyDB_ShouldReturnsEmptyArray() throws Exception {
+        MvcResult result = mockMvc.perform(get("/categories")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        CategoryDto[] actual = objectMapper.readValue(
+                result.getResponse().getContentAsString(), CategoryDto[].class);
+        assertEquals(0, actual.length);
     }
 
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     @Test
     @DisplayName("Get category by id")
-    @Sql(scripts = "classpath:database/books/add-category-fantasy-table.sql",
+    @Sql(scripts = "classpath:database/books/insert-data.sql",
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts =
-            "classpath:database/books/delete-category-by-name.sql",
+            "classpath:database/books/cleanup.sql",
             executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void findById_ValidRequestDto_ReturnsCategoryById() throws Exception {
-        CategoryDto expected = new CategoryDto();
-        expected.setId(1L);
-        expected.setName("Fantasy");
+        CategoryDto expected = createTestCategoryDto();
 
         MvcResult result = mockMvc.perform(get("/categories/1")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -110,5 +141,37 @@ public class CategoryControllerTest {
                 result.getResponse().getContentAsString(), CategoryDto.class);
         Assertions.assertNotNull(actual);
         EqualsBuilder.reflectionEquals(expected, actual);
+    }
+
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    @Test
+    @DisplayName("None existing category id")
+    @Sql(scripts = "classpath:database/books/insert-data.sql",
+            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts =
+            "classpath:database/books/cleanup.sql",
+            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    void findById_WithNoneExistingCategoryId_ShouldThrowException() throws Exception {
+        MvcResult result = mockMvc.perform(get("/categories/5")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andReturn();
+
+        int actual = result.getResponse().getStatus();
+        int expected = 404;
+        assertEquals(actual, expected);
+    }
+
+    private CategoryRequestDto createTestRequestDto() {
+        CategoryRequestDto requestDto = new CategoryRequestDto();
+        requestDto.setName("Fantasy");
+        return requestDto;
+    }
+
+    private CategoryDto createTestCategoryDto() {
+        CategoryDto dto = new CategoryDto();
+        dto.setId(1L);
+        dto.setName("Fantasy");
+        return dto;
     }
 }

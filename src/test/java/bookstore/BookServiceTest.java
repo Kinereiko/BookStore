@@ -1,6 +1,8 @@
 package bookstore;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
@@ -48,33 +50,14 @@ public class BookServiceTest {
             Verify the correct save book from requestDto when requestDto exists
             """)
     public void save_ValidCreateBookRequestDto_ReturnsBookDto() {
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Fantasy");
+        Category category = createTestCategory();
 
-        Book book = new Book();
-        book.setId(1L);
-        book.setTitle("Witcher");
-        book.setAuthor("Sapkovsky");
-        book.setIsbn("1981112314470");
-        book.setPrice(BigDecimal.valueOf(30.75));
-        Set<Category> categories = new HashSet<>();
+        Book book = createTestBook();
 
-        CreateBookRequestDto requestDto = new CreateBookRequestDto();
-        requestDto.setTitle(book.getTitle());
-        requestDto.setAuthor(book.getAuthor());
-        requestDto.setIsbn(book.getIsbn());
-        requestDto.setPrice(book.getPrice());
-        requestDto.setCategoryIds(new ArrayList<>());
+        CreateBookRequestDto requestDto = createTestBookRequestDto(book);
         requestDto.getCategoryIds().add(category.getId());
 
-        BookDto bookDto = new BookDto();
-        bookDto.setId(book.getId());
-        bookDto.setTitle(book.getTitle());
-        bookDto.setAuthor(book.getAuthor());
-        bookDto.setIsbn(book.getIsbn());
-        bookDto.setPrice(book.getPrice());
-        bookDto.setCategoryIds(new ArrayList<>());
+        BookDto bookDto = createTestBookDto(book);
         bookDto.getCategoryIds().add(category.getId());
 
         when(bookMapper.toModel(requestDto)).thenReturn(book);
@@ -90,28 +73,32 @@ public class BookServiceTest {
 
     @Test
     @DisplayName("""
+            Verify the throw exception when request dto is null
+            """)
+    public void save_BookRequestDtoIsNull_ShouldThrowException() {
+        CreateBookRequestDto requestDto = null;
+        Book book = null;
+
+        when(bookMapper.toModel(requestDto)).thenReturn(book);
+        Exception exception = assertThrows(NullPointerException.class,
+                () -> bookService.save(requestDto));
+
+        String expected = "Cannot invoke \"bookstore.model.Book.getCategories()\" because "
+                + "\"book\" is null";
+        String actual = exception.getMessage();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    @DisplayName("""
             Verify the correct save book from requestDto when requestDto exists
             """)
     public void findAll_ValidMethod_ReturnsAllBookDtos() {
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Fantasy");
+        Category category = createTestCategory();
 
-        Book book = new Book();
-        book.setId(1L);
-        book.setTitle("Witcher");
-        book.setAuthor("Sapkovsky");
-        book.setIsbn("1981112314470");
-        book.setPrice(BigDecimal.valueOf(30.75));
-        Set<Category> categories = new HashSet<>();
+        Book book = createTestBook();
 
-        BookDto bookDto = new BookDto();
-        bookDto.setId(book.getId());
-        bookDto.setTitle(book.getTitle());
-        bookDto.setAuthor(book.getAuthor());
-        bookDto.setIsbn(book.getIsbn());
-        bookDto.setPrice(book.getPrice());
-        bookDto.setCategoryIds(new ArrayList<>());
+        BookDto bookDto = createTestBookDto(book);
         bookDto.getCategoryIds().add(category.getId());
 
         Pageable pageable = PageRequest.of(0, 10);
@@ -130,28 +117,31 @@ public class BookServiceTest {
 
     @Test
     @DisplayName("""
-            Verify the correct book title was returned when book exists
+            Verify the throw exception when pageable is null
+            """)
+    public void findAll_PageableIsNull_ShouldThrowException() {
+        Pageable pageable = null;
+
+        Exception exception = assertThrows(NullPointerException.class,
+                () -> bookService.findAll(pageable));
+
+        String expected = "Cannot invoke \"org.springframework.data.domain.Page.stream()\" "
+                + "because the return value of \"bookstore.repository."
+                + "BookRepository.findAll(org.springframework.data.domain.Pageable)\" is null";
+        String actual = exception.getMessage();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    @DisplayName("""
+            Verify the correct book dto was returned when book exists
             """)
     public void findById_ValidMethod_ReturnsBookDto() {
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Fantasy");
+        Category category = createTestCategory();
 
-        Book book = new Book();
-        book.setId(1L);
-        book.setTitle("Witcher");
-        book.setAuthor("Sapkovsky");
-        book.setIsbn("1981112314470");
-        book.setPrice(BigDecimal.valueOf(30.75));
-        Set<Category> categories = Set.of(category);
+        Book book = createTestBook();
 
-        BookDto bookDto = new BookDto();
-        bookDto.setId(book.getId());
-        bookDto.setTitle(book.getTitle());
-        bookDto.setAuthor(book.getAuthor());
-        bookDto.setIsbn(book.getIsbn());
-        bookDto.setPrice(book.getPrice());
-        bookDto.setCategoryIds(new ArrayList<>());
+        BookDto bookDto = createTestBookDto(book);
         bookDto.getCategoryIds().add(category.getId());
 
         when(bookRepository.findById(book.getId())).thenReturn(Optional.of(book));
@@ -161,5 +151,61 @@ public class BookServiceTest {
 
         assertThat(actual).isEqualTo(bookDto);
         verifyNoMoreInteractions(bookRepository, bookMapper);
+    }
+
+    @Test
+    @DisplayName("""
+            Verify the throw Exception when don't existing book id
+            """)
+    public void findById_WithNoneExistingBookId_ShouldThrowException() {
+        Long bookId = 100L;
+
+        when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(RuntimeException.class, () ->
+                bookService.findById(bookId));
+
+        String expected = "Can't find book with id: " + bookId;
+        String actual = exception.getMessage();
+        assertEquals(expected, actual);
+    }
+
+    private Category createTestCategory() {
+        Category category = new Category();
+        category.setId(1L);
+        category.setName("Fantasy");
+        return category;
+    }
+
+    private Book createTestBook() {
+        Book book = new Book();
+        book.setId(1L);
+        book.setTitle("Witcher");
+        book.setAuthor("Sapkovsky");
+        book.setIsbn("1981112314470");
+        book.setPrice(BigDecimal.valueOf(30.75));
+        Set<Category> categories = new HashSet<>();
+        return book;
+    }
+
+    private CreateBookRequestDto createTestBookRequestDto(Book book) {
+        CreateBookRequestDto requestDto = new CreateBookRequestDto();
+        requestDto.setTitle(book.getTitle());
+        requestDto.setAuthor(book.getAuthor());
+        requestDto.setIsbn(book.getIsbn());
+        requestDto.setPrice(book.getPrice());
+        requestDto.setCategoryIds(new ArrayList<>());
+        return requestDto;
+    }
+
+    private BookDto createTestBookDto(Book book) {
+        BookDto bookDto = new BookDto();
+        bookDto.setId(book.getId());
+        bookDto.setTitle(book.getTitle());
+        bookDto.setAuthor(book.getAuthor());
+        bookDto.setIsbn(book.getIsbn());
+        bookDto.setPrice(book.getPrice());
+        bookDto.setCategoryIds(new ArrayList<>());
+        return bookDto;
     }
 }

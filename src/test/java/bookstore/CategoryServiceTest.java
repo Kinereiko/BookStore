@@ -1,6 +1,9 @@
 package bookstore;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
@@ -48,15 +51,11 @@ public class CategoryServiceTest {
             Verify the correct save category from requestDto when requestDto exists
             """)
     public void save_ValidCreateCategoryRequestDto_ReturnsCategoryDto() {
-        CategoryRequestDto requestDto = new CategoryRequestDto();
-        requestDto.setName("Fantasy");
+        CategoryRequestDto requestDto = createTestCategoryRequestDto();
 
-        Category category = new Category();
-        category.setName("Fantasy");
+        Category category = createTestCategory();
 
-        CategoryDto categoryDto = new CategoryDto();
-        categoryDto.setId(1L);
-        categoryDto.setName("Fantasy");
+        CategoryDto categoryDto = createTestCategoryDto();
 
         when(categoryMapper.toModel(requestDto)).thenReturn(category);
         when(categoryRepository.save(category)).thenReturn(category);
@@ -70,16 +69,26 @@ public class CategoryServiceTest {
 
     @Test
     @DisplayName("""
+            Verify the return null when request dto is null
+            """)
+    public void save_CategoryRequestDtoIsNull_ShouldThrowException() {
+        CategoryRequestDto requestDto = null;
+        Category category = null;
+
+        when(categoryMapper.toModel(requestDto)).thenReturn(category);
+        CategoryDto actual = categoryService.save(requestDto);
+
+        assertNull(actual);
+    }
+
+    @Test
+    @DisplayName("""
             Verify findAll method works
             """)
     public void findAll_ValidMethod_ReturnsAllCategoryDtos() {
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Fantasy");
+        Category category = createTestCategory();
 
-        CategoryDto categoryDto = new CategoryDto();
-        categoryDto.setId(category.getId());
-        categoryDto.setName(category.getName());
+        CategoryDto categoryDto = createTestCategoryDto();
 
         List<Category> categories = List.of(category);
 
@@ -98,13 +107,9 @@ public class CategoryServiceTest {
             Verify findId method works
             """)
     public void findId_WithValidCategoryId_ReturnsCategoryDto() {
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Fantasy");
+        Category category = createTestCategory();
 
-        CategoryDto categoryDto = new CategoryDto();
-        categoryDto.setId(category.getId());
-        categoryDto.setName(category.getName());
+        CategoryDto categoryDto = createTestCategoryDto();
 
         when(categoryRepository.findById(category.getId())).thenReturn(Optional.of(category));
         when(categoryMapper.toDto(category)).thenReturn(categoryDto);
@@ -117,27 +122,31 @@ public class CategoryServiceTest {
 
     @Test
     @DisplayName("""
+            Verify the throw Exception when don't existing book id
+            """)
+    public void findById_WithNoneExistingCategoryId_ShouldThrowException() {
+        Long categoryId = 100L;
+
+        when(categoryRepository.findById(categoryId)).thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(RuntimeException.class,
+                () -> categoryService.findById(categoryId));
+
+        String expected = "Can't find category with id: " + categoryId;
+        String actual = exception.getMessage();
+        assertEquals(actual, expected);
+    }
+
+    @Test
+    @DisplayName("""
             Verify getBookByCategoryId method works
             """)
     public void getBooksByCategoryId_WithValidCategoryId_ReturnsListOfBookDtoWithoutCategoryIds() {
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Fantasy");
+        Category category = createTestCategory();
 
-        Book book = new Book();
-        book.setId(1L);
-        book.setTitle("Witcher");
-        book.setAuthor("Sapkovski");
-        book.setIsbn("1981112314470");
-        book.setPrice(BigDecimal.valueOf(30.75));
-        book.getCategories().add(category);
+        Book book = createTestBook(category);
 
-        BookDtoWithoutCategoryIds bookDto = new BookDtoWithoutCategoryIds();
-        bookDto.setId(book.getId());
-        bookDto.setTitle(book.getTitle());
-        bookDto.setAuthor(book.getAuthor());
-        bookDto.setIsbn(book.getIsbn());
-        bookDto.setPrice(book.getPrice());
+        BookDtoWithoutCategoryIds bookDto = createTestBookDtoWithoutCategoryIds(book);
 
         Pageable pageable = PageRequest.of(0, 10);
         List<Book> books = List.of(book);
@@ -151,5 +160,46 @@ public class CategoryServiceTest {
         assertThat(bookDtos).hasSize(1);
         assertThat(bookDtos.get(0)).isEqualTo(bookDto);
         verifyNoMoreInteractions(bookRepository, bookMapper);
+    }
+
+    private CategoryRequestDto createTestCategoryRequestDto() {
+        CategoryRequestDto requestDto = new CategoryRequestDto();
+        requestDto.setName("Fantasy");
+        return requestDto;
+    }
+
+    private Category createTestCategory() {
+        Category category = new Category();
+        category.setId(1L);
+        category.setName("Fantasy");
+        return category;
+    }
+
+    private CategoryDto createTestCategoryDto() {
+        CategoryDto categoryDto = new CategoryDto();
+        categoryDto.setId(1L);
+        categoryDto.setName("Fantasy");
+        return categoryDto;
+    }
+
+    private Book createTestBook(Category category) {
+        Book book = new Book();
+        book.setId(1L);
+        book.setTitle("Witcher");
+        book.setAuthor("Sapkovski");
+        book.setIsbn("1981112314470");
+        book.setPrice(BigDecimal.valueOf(30.75));
+        book.getCategories().add(category);
+        return book;
+    }
+
+    private BookDtoWithoutCategoryIds createTestBookDtoWithoutCategoryIds(Book book) {
+        BookDtoWithoutCategoryIds bookDto = new BookDtoWithoutCategoryIds();
+        bookDto.setId(book.getId());
+        bookDto.setTitle(book.getTitle());
+        bookDto.setAuthor(book.getAuthor());
+        bookDto.setIsbn(book.getIsbn());
+        bookDto.setPrice(book.getPrice());
+        return bookDto;
     }
 }

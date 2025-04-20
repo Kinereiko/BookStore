@@ -16,10 +16,10 @@ import org.springframework.test.context.jdbc.Sql;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Sql(scripts = "classpath:database/books/add-witcher-book-to-books-table.sql",
+@Sql(scripts = "classpath:database/books/insert-data.sql",
         executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
 @Sql(scripts =
-        "classpath:database/books/delete-witcher-book-to-books-table.sql",
+        "classpath:database/books/cleanup.sql",
         executionPhase = Sql.ExecutionPhase.AFTER_TEST_CLASS)
 public class BookRepositoryTest {
     @Autowired
@@ -42,7 +42,7 @@ public class BookRepositoryTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Book> resultBooks = bookRepository.findAll(pageable);
 
-        Assertions.assertEquals(1, resultBooks.stream().toList().size());
+        Assertions.assertEquals(3, resultBooks.stream().toList().size());
     }
 
     @Test
@@ -53,6 +53,6 @@ public class BookRepositoryTest {
         Pageable pageable = PageRequest.of(0, 10);
         List<Book> resultBooks = bookRepository.findAllByCategoriesId(1L, pageable);
 
-        Assertions.assertEquals(1, resultBooks.stream().toList().size());
+        Assertions.assertEquals(2, resultBooks.stream().toList().size());
     }
 }
