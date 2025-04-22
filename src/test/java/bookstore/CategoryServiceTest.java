@@ -2,8 +2,8 @@ package bookstore;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
@@ -20,6 +20,7 @@ import bookstore.service.CategoryServiceImpl;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -69,16 +70,14 @@ public class CategoryServiceTest {
 
     @Test
     @DisplayName("""
-            Verify the return null when request dto is null
+            Verify the throw exception when request dto is null
             """)
     public void save_CategoryRequestDtoIsNull_ShouldThrowException() {
         CategoryRequestDto requestDto = null;
         Category category = null;
 
-        when(categoryMapper.toModel(requestDto)).thenReturn(category);
-        CategoryDto actual = categoryService.save(requestDto);
-
-        assertNull(actual);
+        assertThrows(NullPointerException.class,
+                () -> categoryService.save(requestDto));
     }
 
     @Test
@@ -98,7 +97,7 @@ public class CategoryServiceTest {
         List<CategoryDto> categoryDtos = categoryService.findAll();
 
         assertThat(categoryDtos).hasSize(1);
-        assertThat(categoryDtos.get(0)).isEqualTo(categoryDto);
+        assertTrue(EqualsBuilder.reflectionEquals(categoryDtos.get(0), categoryDto));
         verifyNoMoreInteractions(categoryRepository, categoryMapper);
     }
 

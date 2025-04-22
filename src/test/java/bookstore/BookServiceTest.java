@@ -77,16 +77,9 @@ public class BookServiceTest {
             """)
     public void save_BookRequestDtoIsNull_ShouldThrowException() {
         CreateBookRequestDto requestDto = null;
-        Book book = null;
 
-        when(bookMapper.toModel(requestDto)).thenReturn(book);
-        Exception exception = assertThrows(NullPointerException.class,
+        assertThrows(NullPointerException.class,
                 () -> bookService.save(requestDto));
-
-        String expected = "Cannot invoke \"bookstore.model.Book.getCategories()\" because "
-                + "\"book\" is null";
-        String actual = exception.getMessage();
-        assertEquals(expected, actual);
     }
 
     @Test
@@ -122,14 +115,8 @@ public class BookServiceTest {
     public void findAll_PageableIsNull_ShouldThrowException() {
         Pageable pageable = null;
 
-        Exception exception = assertThrows(NullPointerException.class,
+        assertThrows(NullPointerException.class,
                 () -> bookService.findAll(pageable));
-
-        String expected = "Cannot invoke \"org.springframework.data.domain.Page.stream()\" "
-                + "because the return value of \"bookstore.repository."
-                + "BookRepository.findAll(org.springframework.data.domain.Pageable)\" is null";
-        String actual = exception.getMessage();
-        assertEquals(expected, actual);
     }
 
     @Test

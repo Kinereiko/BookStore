@@ -24,6 +24,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto save(CategoryRequestDto requestDto) {
+        if (requestDto == null) {
+            throw new NullPointerException("Request dto must not be null");
+        }
         Category category = categoryMapper.toModel(requestDto);
         return categoryMapper.toDto(categoryRepository.save(category));
     }

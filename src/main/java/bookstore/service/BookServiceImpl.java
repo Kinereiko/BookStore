@@ -28,6 +28,9 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookDto save(CreateBookRequestDto requestDto) {
+        if (requestDto == null) {
+            throw new NullPointerException("Request dto must not be null");
+        }
         Book book = bookMapper.toModel(requestDto);
         book.getCategories().addAll(getCategories(requestDto.getCategoryIds()));
         return bookMapper.toDto(bookRepository.save(book));
@@ -35,6 +38,9 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public List<BookDto> findAll(Pageable pageable) {
+        if (pageable == null) {
+            throw new NullPointerException("Pageable must not be null");
+        }
         return bookRepository.findAll(pageable).stream()
                 .map(bookMapper::toDto)
                 .toList();
