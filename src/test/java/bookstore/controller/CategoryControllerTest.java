@@ -1,6 +1,7 @@
 package bookstore.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -11,7 +12,6 @@ import bookstore.dto.category.CategoryDto;
 import bookstore.dto.category.CategoryRequestDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -62,8 +62,8 @@ public class CategoryControllerTest {
 
         CategoryDto actual = objectMapper.readValue(
                 result.getResponse().getContentAsString(), CategoryDto.class);
-        Assertions.assertNotNull(actual);
-        Assertions.assertNotNull(actual.getId());
+        assertNotNull(actual);
+        assertNotNull(actual.getId());
         assertTrue(EqualsBuilder.reflectionEquals(expected, actual, "id"));
     }
 
@@ -104,8 +104,8 @@ public class CategoryControllerTest {
 
         CategoryDto[] actual = objectMapper.readValue(
                 result.getResponse().getContentAsString(), CategoryDto[].class);
-        Assertions.assertNotNull(actual);
-        Assertions.assertEquals(2, actual.length);
+        assertNotNull(actual);
+        assertEquals(2, actual.length);
     }
 
     @WithMockUser(username = "admin", roles = {"ADMIN"})
@@ -140,7 +140,7 @@ public class CategoryControllerTest {
 
         CategoryDto actual = objectMapper.readValue(
                 result.getResponse().getContentAsString(), CategoryDto.class);
-        Assertions.assertNotNull(actual);
+        assertNotNull(actual);
         assertTrue(EqualsBuilder.reflectionEquals(expected, actual));
     }
 

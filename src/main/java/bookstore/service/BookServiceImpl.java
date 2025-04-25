@@ -38,9 +38,6 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public List<BookDto> findAll(Pageable pageable) {
-        if (pageable == null) {
-            throw new NullPointerException("Pageable must not be null");
-        }
         return bookRepository.findAll(pageable).stream()
                 .map(bookMapper::toDto)
                 .toList();

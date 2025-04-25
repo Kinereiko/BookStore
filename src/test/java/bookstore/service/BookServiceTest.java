@@ -1,4 +1,4 @@
-package bookstore;
+package bookstore.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -13,7 +13,6 @@ import bookstore.model.Book;
 import bookstore.model.Category;
 import bookstore.repository.BookRepository;
 import bookstore.repository.CategoryRepository;
-import bookstore.service.BookServiceImpl;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -106,17 +105,6 @@ public class BookServiceTest {
         assertThat(bookDtos).hasSize(1);
         assertThat(bookDtos.get(0)).isEqualTo(bookDto);
         verifyNoMoreInteractions(bookRepository, bookMapper);
-    }
-
-    @Test
-    @DisplayName("""
-            Verify the throw exception when pageable is null
-            """)
-    public void findAll_PageableIsNull_ShouldThrowException() {
-        Pageable pageable = null;
-
-        assertThrows(NullPointerException.class,
-                () -> bookService.findAll(pageable));
     }
 
     @Test

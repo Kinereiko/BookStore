@@ -1,7 +1,6 @@
-package bookstore;
+package bookstore.repository;
 
 import bookstore.model.Book;
-import bookstore.repository.BookRepository;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
