@@ -1,8 +1,9 @@
 package bookstore.repository;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import bookstore.model.Book;
 import java.util.List;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ public class BookRepositoryTest {
             """)
     void findById_ReturnsBook() {
         Book resultBook = bookRepository.findById(1L).get();
-        Assertions.assertEquals(1L, resultBook.getId());
+        assertEquals(1L, resultBook.getId());
     }
 
     @Test
@@ -41,7 +42,7 @@ public class BookRepositoryTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Book> resultBooks = bookRepository.findAll(pageable);
 
-        Assertions.assertEquals(3, resultBooks.stream().toList().size());
+        assertEquals(3, resultBooks.stream().toList().size());
     }
 
     @Test
@@ -52,6 +53,6 @@ public class BookRepositoryTest {
         Pageable pageable = PageRequest.of(0, 10);
         List<Book> resultBooks = bookRepository.findAllByCategoriesId(1L, pageable);
 
-        Assertions.assertEquals(2, resultBooks.stream().toList().size());
+        assertEquals(2, resultBooks.stream().toList().size());
     }
 }
