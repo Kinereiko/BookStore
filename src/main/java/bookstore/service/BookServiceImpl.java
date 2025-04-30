@@ -28,6 +28,9 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookDto save(CreateBookRequestDto requestDto) {
+        if (requestDto == null) {
+            throw new NullPointerException("Request dto must not be null");
+        }
         Book book = bookMapper.toModel(requestDto);
         book.getCategories().addAll(getCategories(requestDto.getCategoryIds()));
         return bookMapper.toDto(bookRepository.save(book));

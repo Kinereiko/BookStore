@@ -35,7 +35,7 @@ public class Book {
     private String author;
     @Column(unique = true, nullable = false)
     private String isbn;
-    @Column(nullable = false)
+    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
     private String description;
     private String coverImage;
