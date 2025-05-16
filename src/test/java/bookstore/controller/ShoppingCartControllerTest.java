@@ -1,8 +1,8 @@
 package bookstore.controller;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -14,6 +14,8 @@ import bookstore.dto.shoppingcart.ShoppingCartDto;
 import bookstore.model.ShoppingCart;
 import bookstore.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -28,8 +30,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import java.util.ArrayList;
-import java.util.List;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ShoppingCartControllerTest {
@@ -94,7 +94,7 @@ public class ShoppingCartControllerTest {
         UsernamePasswordAuthenticationToken auth =
                 new UsernamePasswordAuthenticationToken(user, null, List.of());
 
-        SecurityContextHolder .getContext().setAuthentication(auth);
+        SecurityContextHolder.getContext().setAuthentication(auth);
 
         CartItemRequestDto requestDto = null;
 
@@ -111,7 +111,6 @@ public class ShoppingCartControllerTest {
         int expected = 400;
         assertEquals(actual, expected);
     }
-
 
     @Test
     @DisplayName("Find shopping cart")
@@ -141,8 +140,6 @@ public class ShoppingCartControllerTest {
         assertNotNull(actual);
         assertTrue(EqualsBuilder.reflectionEquals(expected, actual, "cartItems"));
     }
-
-
 
     private User createTestUser() {
         User user = new User();

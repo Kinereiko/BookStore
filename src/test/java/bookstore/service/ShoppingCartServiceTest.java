@@ -19,6 +19,11 @@ import bookstore.model.User;
 import bookstore.repository.BookRepository;
 import bookstore.repository.CartItemRepository;
 import bookstore.repository.ShoppingCartRepository;
+import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,11 +32,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.test.context.support.WithMockUser;
-import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 @ExtendWith(MockitoExtension.class)
 public class ShoppingCartServiceTest {
@@ -72,7 +72,8 @@ public class ShoppingCartServiceTest {
 
         when(authentication.getPrincipal()).thenReturn(user);
 
-        when(cartItemRepository.findByShoppingCartIdWhereBookId(user.getId(), requestDto.getBookId()))
+        when(cartItemRepository.findByShoppingCartIdWhereBookId(
+                user.getId(), requestDto.getBookId()))
                 .thenReturn(nullCartItem);
 
         when(cartItemMapper.toModel(requestDto)).thenReturn(cartItem);
@@ -106,7 +107,8 @@ public class ShoppingCartServiceTest {
 
         when(authentication.getPrincipal()).thenReturn(user);
 
-        when(cartItemRepository.findByShoppingCartIdWhereBookId(user.getId(), requestDto.getBookId()))
+        when(cartItemRepository.findByShoppingCartIdWhereBookId(
+                user.getId(), requestDto.getBookId()))
                 .thenReturn(cartItem);
 
         when(authentication.getPrincipal()).thenReturn(user);
@@ -169,9 +171,11 @@ public class ShoppingCartServiceTest {
 
         when(shoppingCartRepository.findByUserId(user.getId())).thenReturn(shoppingCart);
 
-        when(shoppingCartMapper.toDto(shoppingCart)).thenReturn(shoppingCartDto);
+        when(shoppingCartMapper.toDto(shoppingCart))
+                .thenReturn(shoppingCartDto);
 
-        ShoppingCartDto actual = shoppingCartService.updateCartItemById(id, quantity, authentication);
+        ShoppingCartDto actual = shoppingCartService
+                .updateCartItemById(id, quantity, authentication);
 
         assertThat(actual).isEqualTo(shoppingCartDto);
         verifyNoMoreInteractions(cartItemRepository, shoppingCartRepository, shoppingCartMapper);
@@ -189,9 +193,11 @@ public class ShoppingCartServiceTest {
 
         when(authentication.getPrincipal()).thenReturn(user);
 
-        when(cartItemRepository.findById(wrongId)).thenThrow(new EntityNotFoundException("Can't find cart item with id: " + wrongId));
+        when(cartItemRepository.findById(wrongId))
+                .thenThrow(new EntityNotFoundException("Can't find cart item with id: " + wrongId));
 
-        assertThrows(EntityNotFoundException.class, () -> shoppingCartService.updateCartItemById(wrongId, quantity, authentication));
+        assertThrows(EntityNotFoundException.class,
+                () -> shoppingCartService.updateCartItemById(wrongId, quantity, authentication));
     }
 
     private User createTestUser() {
