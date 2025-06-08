@@ -1,7 +1,6 @@
 package bookstore.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -16,6 +15,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -53,6 +53,7 @@ public class ShoppingCartControllerTest {
         CartItemRequestDto requestDto = testUtil.createTestCartItemRequestDto();
 
         ShoppingCartDto expected = testUtil.createTestShoppingCartDto();
+        expected.getCartItems().get(0).setQuantity(2);
 
         String jsonRequest = objectMapper.writeValueAsString(requestDto);
 
@@ -65,9 +66,10 @@ public class ShoppingCartControllerTest {
 
         ShoppingCartDto actual = objectMapper.readValue(
                 result.getResponse().getContentAsString(), ShoppingCartDto.class);
-        assertNotNull(actual);
-        assertNotNull(actual.getId());
-        assertEquals(actual.getUserId(), expected.getUserId());
+
+        String expectedJson = objectMapper.writeValueAsString(expected);
+        String actualJson = objectMapper.writeValueAsString(actual);
+        JSONAssert.assertEquals(expectedJson, actualJson, true);
     }
 
     @Test
@@ -112,7 +114,6 @@ public class ShoppingCartControllerTest {
         ShoppingCartDto actual = objectMapper.readValue(
                 result.getResponse().getContentAsString(), ShoppingCartDto.class);
 
-        assertNotNull(actual);
         assertTrue(EqualsBuilder.reflectionEquals(expected, actual, "cartItems"));
     }
 }

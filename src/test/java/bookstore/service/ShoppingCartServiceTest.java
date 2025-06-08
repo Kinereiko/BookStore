@@ -26,7 +26,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.test.context.support.WithMockUser;
 
 @ExtendWith(MockitoExtension.class)
 public class ShoppingCartServiceTest {
@@ -53,7 +52,6 @@ public class ShoppingCartServiceTest {
     @Mock
     private Authentication authentication;
 
-    @WithMockUser(username = "testUser")
     @Test
     @DisplayName("""
             Verify add cart item to shopping cart
@@ -68,19 +66,13 @@ public class ShoppingCartServiceTest {
         ShoppingCartDto shoppingCartDto = testUtil.createTestShoppingCartDto();
 
         when(authentication.getPrincipal()).thenReturn(user);
-
         when(cartItemRepository.findByShoppingCartIdWhereBookId(
                 user.getId(), requestDto.getBookId()))
                 .thenReturn(null);
-
         when(cartItemMapper.toModel(requestDto)).thenReturn(cartItem);
-
         when(shoppingCartRepository.findByUserId(user.getId())).thenReturn(shoppingCart);
-
         when(bookRepository.getReferenceById(requestDto.getBookId())).thenReturn(book);
-
         when(cartItemRepository.save(cartItem)).thenReturn(cartItem);
-
         when(shoppingCartMapper.toDto(shoppingCart)).thenReturn(shoppingCartDto);
 
         ShoppingCartDto actual = shoppingCartService.addCartItem(requestDto, authentication);
@@ -90,7 +82,6 @@ public class ShoppingCartServiceTest {
                 shoppingCartMapper, cartItemMapper);
     }
 
-    @WithMockUser(username = "testUser")
     @Test
     @DisplayName("""
             Verify add cart item to shopping cart when cart item already exists
@@ -103,19 +94,13 @@ public class ShoppingCartServiceTest {
         ShoppingCartDto shoppingCartDto = testUtil.createTestShoppingCartDto();
 
         when(authentication.getPrincipal()).thenReturn(user);
-
         when(cartItemRepository.findByShoppingCartIdWhereBookId(
                 user.getId(), requestDto.getBookId()))
                 .thenReturn(cartItem);
-
         when(authentication.getPrincipal()).thenReturn(user);
-
         when(cartItemRepository.findById(cartItem.getId())).thenReturn(Optional.of(cartItem));
-
         when(cartItemRepository.save(cartItem)).thenReturn(cartItem);
-
         when(shoppingCartRepository.findByUserId(user.getId())).thenReturn(shoppingCart);
-
         when(shoppingCartMapper.toDto(shoppingCart)).thenReturn(shoppingCartDto);
 
         ShoppingCartDto actual = shoppingCartService.addCartItem(requestDto, authentication);
@@ -123,7 +108,6 @@ public class ShoppingCartServiceTest {
         assertThat(actual).isEqualTo(shoppingCartDto);
     }
 
-    @WithMockUser(username = "testUser")
     @Test
     @DisplayName("""
             Verify find cart item in shopping cart
@@ -134,9 +118,7 @@ public class ShoppingCartServiceTest {
         ShoppingCartDto shoppingCartDto = testUtil.createTestShoppingCartDto();
 
         when(authentication.getPrincipal()).thenReturn(user);
-
         when(shoppingCartRepository.findByUserId(user.getId())).thenReturn(shoppingCart);
-
         when(shoppingCartMapper.toDto(shoppingCart)).thenReturn(shoppingCartDto);
 
         ShoppingCartDto actual = shoppingCartService.find(authentication);
@@ -145,7 +127,6 @@ public class ShoppingCartServiceTest {
         verifyNoMoreInteractions(shoppingCartRepository, shoppingCartMapper);
     }
 
-    @WithMockUser(username = "testUser")
     @Test
     @DisplayName("""
             Verify update cart item to shopping cart
@@ -161,13 +142,9 @@ public class ShoppingCartServiceTest {
         ShoppingCartDto shoppingCartDto = testUtil.createTestShoppingCartDto();
 
         when(authentication.getPrincipal()).thenReturn(user);
-
         when(cartItemRepository.findById(id)).thenReturn(Optional.of(cartItem));
-
         when(cartItemRepository.save(cartItem)).thenReturn(updatedCartItem);
-
         when(shoppingCartRepository.findByUserId(user.getId())).thenReturn(shoppingCart);
-
         when(shoppingCartMapper.toDto(shoppingCart))
                 .thenReturn(shoppingCartDto);
 
@@ -178,7 +155,6 @@ public class ShoppingCartServiceTest {
         verifyNoMoreInteractions(cartItemRepository, shoppingCartRepository, shoppingCartMapper);
     }
 
-    @WithMockUser(username = "testUser")
     @Test
     @DisplayName("""
             Verify update cart item to shopping cart invalid cart item id
@@ -189,7 +165,6 @@ public class ShoppingCartServiceTest {
         int quantity = 2;
 
         when(authentication.getPrincipal()).thenReturn(user);
-
         when(cartItemRepository.findById(wrongId))
                 .thenThrow(new EntityNotFoundException("Can't find cart item with id: " + wrongId));
 

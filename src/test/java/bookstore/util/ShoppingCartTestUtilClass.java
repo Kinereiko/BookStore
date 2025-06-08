@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 public class ShoppingCartTestUtilClass {
-    public User createTestUser() {
+    public static User createTestUser() {
         User user = new User();
         user.setId(1L);
         user.setEmail("test@gmail.com");
@@ -24,7 +24,7 @@ public class ShoppingCartTestUtilClass {
         return user;
     }
 
-    public Book createTestBook() {
+    public static Book createTestBook() {
         Book book = new Book();
         book.setId(1L);
         book.setTitle("Witcher");
@@ -35,7 +35,7 @@ public class ShoppingCartTestUtilClass {
         return book;
     }
 
-    public CartItem createTestCartItem() {
+    public static CartItem createTestCartItem() {
         CartItem cartItem = new CartItem();
         cartItem.setId(1L);
         cartItem.setShoppingCart(new ShoppingCart());
@@ -44,14 +44,14 @@ public class ShoppingCartTestUtilClass {
         return cartItem;
     }
 
-    public CartItemRequestDto createTestCartItemRequestDto() {
+    public static CartItemRequestDto createTestCartItemRequestDto() {
         CartItemRequestDto cartItemRequestDto = new CartItemRequestDto();
         cartItemRequestDto.setBookId(1L);
         cartItemRequestDto.setQuantity(1);
         return cartItemRequestDto;
     }
 
-    private CartItemDto createTestCartItemDto() {
+    private static CartItemDto createTestCartItemDto() {
         CartItemDto cartItemDto = new CartItemDto();
         cartItemDto.setId(1L);
         cartItemDto.setBookId(1L);
@@ -60,14 +60,14 @@ public class ShoppingCartTestUtilClass {
         return cartItemDto;
     }
 
-    public ShoppingCart createTestShoppingCart() {
+    public static ShoppingCart createTestShoppingCart() {
         ShoppingCart shoppingCart = new ShoppingCart();
         shoppingCart.setId(1L);
         shoppingCart.setUser(createTestUser());
         return shoppingCart;
     }
 
-    public ShoppingCartDto createTestShoppingCartDto() {
+    public static ShoppingCartDto createTestShoppingCartDto() {
         ShoppingCartDto shoppingCartDto = new ShoppingCartDto();
         shoppingCartDto.setId(1L);
         shoppingCartDto.setUserId(1L);
