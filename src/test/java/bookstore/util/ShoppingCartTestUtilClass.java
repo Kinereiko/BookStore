@@ -51,7 +51,7 @@ public class ShoppingCartTestUtilClass {
         return cartItemRequestDto;
     }
 
-    private static CartItemDto createTestCartItemDto() {
+    public static CartItemDto createTestCartItemDto() {
         CartItemDto cartItemDto = new CartItemDto();
         cartItemDto.setId(1L);
         cartItemDto.setBookId(1L);

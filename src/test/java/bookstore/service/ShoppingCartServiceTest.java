@@ -1,5 +1,11 @@
 package bookstore.service;
 
+import static bookstore.util.ShoppingCartTestUtilClass.createTestBook;
+import static bookstore.util.ShoppingCartTestUtilClass.createTestCartItem;
+import static bookstore.util.ShoppingCartTestUtilClass.createTestCartItemRequestDto;
+import static bookstore.util.ShoppingCartTestUtilClass.createTestShoppingCart;
+import static bookstore.util.ShoppingCartTestUtilClass.createTestShoppingCartDto;
+import static bookstore.util.ShoppingCartTestUtilClass.createTestUser;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -17,7 +23,6 @@ import bookstore.model.User;
 import bookstore.repository.BookRepository;
 import bookstore.repository.CartItemRepository;
 import bookstore.repository.ShoppingCartRepository;
-import bookstore.util.ShoppingCartTestUtilClass;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,7 +34,6 @@ import org.springframework.security.core.Authentication;
 
 @ExtendWith(MockitoExtension.class)
 public class ShoppingCartServiceTest {
-    private final ShoppingCartTestUtilClass testUtil = new ShoppingCartTestUtilClass();
 
     @InjectMocks
     private ShoppingCartServiceImpl shoppingCartService;
@@ -57,13 +61,13 @@ public class ShoppingCartServiceTest {
             Verify add cart item to shopping cart
             """)
     public void addCartItem_ValidCartItemRequestDto_ReturnsShoppingCartDto() {
-        User user = testUtil.createTestUser();
-        Book book = testUtil.createTestBook();
-        CartItemRequestDto requestDto = testUtil.createTestCartItemRequestDto();
-        CartItem cartItem = testUtil.createTestCartItem();
+        User user = createTestUser();
+        Book book = createTestBook();
+        CartItemRequestDto requestDto = createTestCartItemRequestDto();
+        CartItem cartItem = createTestCartItem();
 
-        ShoppingCart shoppingCart = testUtil.createTestShoppingCart();
-        ShoppingCartDto shoppingCartDto = testUtil.createTestShoppingCartDto();
+        ShoppingCart shoppingCart = createTestShoppingCart();
+        ShoppingCartDto shoppingCartDto = createTestShoppingCartDto();
 
         when(authentication.getPrincipal()).thenReturn(user);
         when(cartItemRepository.findByShoppingCartIdWhereBookId(
@@ -87,11 +91,11 @@ public class ShoppingCartServiceTest {
             Verify add cart item to shopping cart when cart item already exists
             """)
     public void addCartItem_CartItemAlreadyExists_ReturnsShoppingCartDto() {
-        User user = testUtil.createTestUser();
-        CartItemRequestDto requestDto = testUtil.createTestCartItemRequestDto();
-        CartItem cartItem = testUtil.createTestCartItem();
-        ShoppingCart shoppingCart = testUtil.createTestShoppingCart();
-        ShoppingCartDto shoppingCartDto = testUtil.createTestShoppingCartDto();
+        User user = createTestUser();
+        CartItemRequestDto requestDto = createTestCartItemRequestDto();
+        CartItem cartItem = createTestCartItem();
+        ShoppingCart shoppingCart = createTestShoppingCart();
+        ShoppingCartDto shoppingCartDto = createTestShoppingCartDto();
 
         when(authentication.getPrincipal()).thenReturn(user);
         when(cartItemRepository.findByShoppingCartIdWhereBookId(
@@ -113,9 +117,9 @@ public class ShoppingCartServiceTest {
             Verify find cart item in shopping cart
             """)
     public void find_ValidAuthentication_ReturnsShoppingCartDto() {
-        User user = testUtil.createTestUser();
-        ShoppingCart shoppingCart = testUtil.createTestShoppingCart();
-        ShoppingCartDto shoppingCartDto = testUtil.createTestShoppingCartDto();
+        User user = createTestUser();
+        ShoppingCart shoppingCart = createTestShoppingCart();
+        ShoppingCartDto shoppingCartDto = createTestShoppingCartDto();
 
         when(authentication.getPrincipal()).thenReturn(user);
         when(shoppingCartRepository.findByUserId(user.getId())).thenReturn(shoppingCart);
@@ -134,12 +138,12 @@ public class ShoppingCartServiceTest {
     public void updateCartItemById_ValidCartItem_ReturnsShoppingCartDto() {
         Long id = 1L;
         int quantity = 2;
-        User user = testUtil.createTestUser();
-        CartItem cartItem = testUtil.createTestCartItem();
-        CartItem updatedCartItem = testUtil.createTestCartItem();
+        User user = createTestUser();
+        CartItem cartItem = createTestCartItem();
+        CartItem updatedCartItem = createTestCartItem();
         updatedCartItem.setQuantity(quantity);
-        ShoppingCart shoppingCart = testUtil.createTestShoppingCart();
-        ShoppingCartDto shoppingCartDto = testUtil.createTestShoppingCartDto();
+        ShoppingCart shoppingCart = createTestShoppingCart();
+        ShoppingCartDto shoppingCartDto = createTestShoppingCartDto();
 
         when(authentication.getPrincipal()).thenReturn(user);
         when(cartItemRepository.findById(id)).thenReturn(Optional.of(cartItem));
@@ -160,7 +164,7 @@ public class ShoppingCartServiceTest {
             Verify update cart item to shopping cart invalid cart item id
             """)
     public void updateCartItemById_InvalidCartItemId_ReturnsException() {
-        User user = testUtil.createTestUser();
+        User user = createTestUser();
         Long wrongId = 2L;
         int quantity = 2;
 

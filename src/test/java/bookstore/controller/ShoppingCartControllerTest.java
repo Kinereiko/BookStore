@@ -1,7 +1,10 @@
 package bookstore.controller;
 
+import static bookstore.util.ShoppingCartTestUtilClass.createTestCartItemRequestDto;
+import static bookstore.util.ShoppingCartTestUtilClass.createTestShoppingCartDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -9,13 +12,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import bookstore.dto.cartitem.CartItemRequestDto;
 import bookstore.dto.shoppingcart.ShoppingCartDto;
-import bookstore.util.ShoppingCartTestUtilClass;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -29,7 +30,7 @@ import org.springframework.web.context.WebApplicationContext;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ShoppingCartControllerTest {
     protected static MockMvc mockMvc;
-    private final ShoppingCartTestUtilClass testUtil = new ShoppingCartTestUtilClass();
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -50,9 +51,9 @@ public class ShoppingCartControllerTest {
             "classpath:database/books/cleanup.sql",
             executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void save_ValidRequestDto_Success() throws Exception {
-        CartItemRequestDto requestDto = testUtil.createTestCartItemRequestDto();
+        CartItemRequestDto requestDto = createTestCartItemRequestDto();
 
-        ShoppingCartDto expected = testUtil.createTestShoppingCartDto();
+        ShoppingCartDto expected = createTestShoppingCartDto();
         expected.getCartItems().get(0).setQuantity(2);
 
         String jsonRequest = objectMapper.writeValueAsString(requestDto);
@@ -69,7 +70,7 @@ public class ShoppingCartControllerTest {
 
         String expectedJson = objectMapper.writeValueAsString(expected);
         String actualJson = objectMapper.writeValueAsString(actual);
-        JSONAssert.assertEquals(expectedJson, actualJson, true);
+        assertEquals(expectedJson, actualJson, true);
     }
 
     @Test
@@ -103,8 +104,8 @@ public class ShoppingCartControllerTest {
     @Sql(scripts =
             "classpath:database/books/cleanup.sql",
             executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    void find_ValidAuthentication_Success() throws Exception {
-        ShoppingCartDto expected = testUtil.createTestShoppingCartDto();
+    void getCart_WithAuthenticatedUser_ReturnsShoppingCart() throws Exception {
+        ShoppingCartDto expected = createTestShoppingCartDto();
 
         MvcResult result = mockMvc.perform(get("/cart")
                 .contentType(MediaType.APPLICATION_JSON))
