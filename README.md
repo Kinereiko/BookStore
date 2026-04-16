@@ -52,10 +52,11 @@ The system is built on a RESTful architecture and includes the following main co
 
 #### OrderController
 
+- **POST: /orders** - Create a new order
 - **GET: /orders** - View list all available orders
 - **GET: /orders/{id}** - View an order by id
 - **GET: /orders/{orderId}/items/{itemId}** - View an item by itemId in the order by orderId
-- **PATCH: /orders/{id}** - Change status order by id (only for role ADMIN)
+- **PUT: /orders/{id}** - Change status order by id (only for role ADMIN)
 
 #### CategoryController
 
